@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>jQueryでバリデーション</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- bootstrap -->
+<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" type="text/css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+
+    $(function(){
+
+      //一応エラーメッセージ部分を非表示にしておく
+       $("#username_error").hide();
+       $("#password_error").hide();
+       $("#retypepassword_error").hide();
+
+       //バリデーション用のフラグ
+        var user_name_has_error = true;
+        var password_has_error = true;
+        var retype_password_has_error = true;
+
+
+        //名前フォームからフォーカスが外れたとき
+        $("#form-username").focusout(function(){
+           check_username();
+        });
+
+        //パスワードのチェック
+        $("#form-password").focusout(function(){
+           check_password();
+        });
+
+
+
+        //パスワード再確認項目のチェック
+        $("#form-retypepassword").focusout(function(){
+            check_retypepassword();
+        });
+
+
+        //ユーザーネームフォームのチェック処理
+        function check_username(){
+            //文字数を取得する
+            var form_length = $("#form-username").val().length;
+
+            if(form_length === 0){
+               user_name_has_error = true;
+               return;
+            }
+
+
+            if(form_length < 5 || form_length > 20){//5-20文字
+                $("#username_error").html("５文字以上２０文字以内である必要があります");
+                $("#username_error").show();
+                //エラーフラグ
+                user_name_has_error = true;
+            }else{
+                user_name_has_error = false;
+                 $("#username_error").hide();
+
+            }
+
+        }
+
+
+        //パスワードのチェック
+        function check_password(){
+            var form_length = $("#form-password").val().length;
+
+            //そもそも入力がないときはチェック処理を行わない
+            //これでボタン監視の際にエラーメッセージを出力させないようにします
+            if(form_length === 0){
+                password_has_error = true;
+                return;
+            }
+
+            if(form_length < 8){
+                $("#password_error").html("パスワードは8文字以上である必要があります");
+                $("#password_error").show();
+                password_has_error = true;
+            }else{
+                $("#password_error").hide();
+                password_has_error = false;
+            }
+        }
+
+        //パスワード再確認のチェック
+        function check_retypepassword(){
+
+            var form_length = $("#form-retypepassword").val().length;
+
+            if(form_length === 0){
+                retype_password_has_error = true;
+                return;
+            }
+
+             //文字数でなく中身を取得する
+                var password = $("#form-password").val();
+                var retype_password = $("#form-retypepassword").val();
+                //一致していない場合エラー
+                if(password != retype_password){
+                    $("#retypepassword_error").html("パスワードが一致していません");
+                    $("#retypepassword_error").show();
+                    retype_password_has_error = true;
+                }else{
+                    $("#retypepassword_error").hide();
+                    retype_password_has_error = false;
+                }
+        }
+
+
+
+
+        $("#register_form").submit(function(){
+
+
+            //再度チェックする
+            check_username();
+            check_password();
+            check_retypepassword();
+
+            //全てのエラーチェックを通った時のみ送信可能にする
+            if(user_name_has_error == false && password_has_error == false && retype_password_has_error == false){
+               return true;
+            }else{
+                return false;
+            }
+
+        });
+
+
+        //フォーム内で変更が起きた時
+        $("form").change(function(){
+
+            check_username();
+            check_password();
+            check_retypepassword();
+
+            //エラーがなければボタンの状態（クラス名）を変更する
+            if(user_name_has_error == false && password_has_error == false && retype_password_has_error == false){
+                $("#form_btn").removeClass().addClass("btn btn-primary");
+            }else{
+                $("#form_btn").removeClass().addClass("btn btn-primary disabled");
+            }
+        });
+
+
+    });
+
+
+</script>
+
+
+
+
+<style type="text/css">
+
+
+    h2{
+        margin-top: 30px;
+        color: blue;
+    }
+
+    table{
+        margin: 100px;
+    }
+    td{
+        padding: 10px;
+    }
+
+    .error_meaasage{
+        color: red;
+    }
+
+
+</style>
+
+
+
+</head>
+
+
+
+
+
+
+
+
+
+
+
+<body>
+
+    <div class="container">
+
+        <h2>バリデーションサンプル</h2>
+
+    <form id="register_form" action="" method="post">
+
+        <table>
+
+            <tr>
+                <td>UserName</td><td><input type="text" class="form-control" id="form-username" /></td><td><span class="error_meaasage" id="username_error"></span></td>
+            </tr>
+
+            <tr>
+                <td>PassWord</td><td><input type="password" class="form-control" id="form-password" /></td><td><span class="error_meaasage" id="password_error"></span></td>
+            </tr>
+
+            <tr>
+                <td>Retype Password</td><td><input type="password" class="form-control" id="form-retypepassword" /></td><td><span class="error_meaasage" id="retypepassword_error"></span></td>
+            </tr>
+
+            <tr>
+                <td><button type="submit" class="btn btn-primary disabled" id="form_btn">登録する</button></td><td></td>
+            </tr>
+        </table>
+
+    </form>
+
+   </div>
+
+</body>
+</html>
